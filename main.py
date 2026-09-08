@@ -1,6 +1,7 @@
 import typer
 from rich.console import Console
-from rich.prompt import Prompt
+from prompt_toolkit import PromptSession
+from prompt_toolkit.history import FileHistory
 
 app = typer.Typer(help="Alethe - Offline AI CLI")
 console = Console()
@@ -21,10 +22,11 @@ def chat(
     console.print("Type [bold yellow]/switch <model>[/bold yellow] to change providers or [bold red]/exit[/bold red] to quit.\n")
     
     active_model = model
+    session = PromptSession(history=FileHistory(".cli_history"))
 
     while True:
         try:
-            user_input = Prompt.ask(f"[bold blue]User ({active_model})[/bold blue]")
+            user_input = session.ask(f"[bold blue]User ({active_model})[/bold blue]")
             
             if not user_input.strip():
                 continue
