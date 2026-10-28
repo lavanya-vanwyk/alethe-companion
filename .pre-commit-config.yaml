@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: trufflehog
+        name: TruffleHog
+        description: Detect secrets in your data with TruffleHog.
+        entry: trufflehog filesystem --only-verified --fail
+        language: system
+        stages: ["pre-commit", "pre-push"]
