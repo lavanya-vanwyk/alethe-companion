@@ -1,3 +1,4 @@
+from src.application.pii_gateway import PIIGateway
 from src.application.session_manager import SessionManager
 from src.infrastructure.git_tracker import ASTGitTracker
 from src.infrastructure.redis_vault import RedisTokenVault
@@ -9,8 +10,10 @@ def main():
     # Instantiate services
     git_tracker = ASTGitTracker()
     redis_vault = RedisTokenVault()
+    pii_gateway = PIIGateway(vault=redis_vault)
+
     session_manager = SessionManager(
-        vault=redis_vault, git_tracker=git_tracker, default_model="ollama"
+        pii_gateway=pii_gateway, git_tracker=git_tracker, default_model="ollama"
     )
 
     # pass dependencies into the CLI via Typer's context object
