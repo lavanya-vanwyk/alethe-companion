@@ -1,5 +1,6 @@
+from src.application.pii_gateway import PIIGateway
 from src.domain.entities import SessionState
-from src.domain.ports import GitTrackerPort, TokenVaultPort
+from src.domain.ports import GitTrackerPort
 
 
 class SessionManager:
@@ -7,14 +8,14 @@ class SessionManager:
 
     def __init__(
         self,
-        vault: TokenVaultPort | None = None,
+        pii_gateway: PIIGateway | None = None,
         git_tracker: GitTrackerPort | None = None,
         default_model: str = "ollama",
     ):
         self.state = SessionState(
             session_id="default-session", active_model=default_model
         )
-        self.vault = vault
+        self.pii_gateway = pii_gateway
         self.git_tracker = git_tracker
 
     def switch_model(self, new_model: str) -> None:
