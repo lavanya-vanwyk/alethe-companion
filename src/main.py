@@ -5,9 +5,14 @@ from src.infrastructure.redis_vault import RedisTokenVault
 
 def main():
     
-    # Instantiate valut
+    # Instantiate services
     redis_vault = RedisTokenVault()
-    session_manager = SessionManager(default_model="ollama")
+    session_manager = SessionManager(
+        vault=redis_vault, 
+        git_tracker=git_tracker, 
+        default_model="ollama"
+    )
+    git_tracker = ASTGitTracker()
     
     # pass dependencies into the CLI via Typer's context object
     cli_app(obj=session_manager)

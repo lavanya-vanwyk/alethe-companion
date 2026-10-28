@@ -3,11 +3,17 @@ from src.domain.entities import SessionState
 class SessionManager:
     """Orchestrates the chat session, acting as the primary Application Service."""
     
-    def __init__(self, default_model: str = "ollama"):
+    def __init__(
+        self, 
+        vault: Optional[TokenVaultPort] = None, 
+        git_tracker: Optional[GitTrackerPort] = None,
+        default_model: str = "ollama"
+    ):
         self.state = SessionState(session_id="default-session", active_model=default_model)
+        self.vault = vault
+        self.git_tracker = git_tracker
 
     def switch_model(self, new_model: str) -> None:
-        """Updates the active model in the domain state."""
         self.state.active_model = new_model
 
     def process_input(self, user_input: str) -> str:
@@ -17,9 +23,18 @@ class SessionManager:
         """
         self.state.increment_turn()
         
-        # Check TTL constraint from domain entity
+        if user_input.strip().lower() == "/diff" and self.git_tracker:
+            deltas = self.git_tracker.get_structural_diffs()
+            if not deltas:
+                return "[System] No staged Python changes detected in Git."
+            
+            output = "[System] Current Staged AST Diffs:\n"
+            for d in deltas:
+                output += f"- {d.file_path}: {d.structural_summary} (Lines: {d.changed_lines})\n"
+            return output
+        
+        # Check TTL constraint from domain entity    
         if self.state.is_ttl_reached():
-            # Placeholder for RAG Rollover in Sprint 4
             self.state.reset_ttl()
             return "[System] TTL limit reached. Triggering state compression (Mocked)..."
             
