@@ -1,7 +1,7 @@
-import pytest
-from unittest.mock import patch, mock_open, MagicMock
-from src.infrastructure.git_tracker import ASTGitTracker
+from unittest.mock import MagicMock, mock_open, patch
+
 from src.domain.entities import CodeChangeDelta
+from src.infrastructure.git_tracker import ASTGitTracker
 
 # Mocked output of `git diff --cached -U0`
 MOCK_DIFF_STDOUT = """diff --git a/dummy_service.py b/dummy_service.py
@@ -18,6 +18,7 @@ MOCK_SOURCE_CODE = """class AuthService:
         return True
 """
 
+
 @patch("src.infrastructure.git_tracker.subprocess.run")
 def test_ast_tracker_get_changed_lines(mock_subprocess_run):
     """Verifies that git diffs are correctly parsed into file and line numbers."""
@@ -32,6 +33,7 @@ def test_ast_tracker_get_changed_lines(mock_subprocess_run):
     # The start line from @@ -2,2 +2,2 @@ is +2, so it should extract 2
     assert changed_lines["dummy_service.py"] == [2]
 
+
 @patch("src.infrastructure.git_tracker.subprocess.run")
 @patch("builtins.open", new_callable=mock_open, read_data=MOCK_SOURCE_CODE)
 def test_ast_tracker_structural_summaries(mock_file, mock_subprocess_run):
@@ -45,11 +47,11 @@ def test_ast_tracker_structural_summaries(mock_file, mock_subprocess_run):
 
     assert len(deltas) == 1
     delta = deltas[0]
-    
+
     # Validate the CodeChangeDelta domain entity properties
     assert isinstance(delta, CodeChangeDelta)
     assert delta.file_path == "dummy_service.py"
     assert delta.changed_lines == [2]
-    
+
     # AST parser should detect the Function Definition
     assert "Function Definition: 'authenticate'" in delta.structural_summary
