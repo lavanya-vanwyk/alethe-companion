@@ -41,3 +41,14 @@ class SessionState(BaseModel):
 
     def reset_ttl(self) -> None:
         self.current_turns = 0
+
+
+class PIIMatch(BaseModel):
+    """Represents a discovered sensitive data entity."""
+
+    pii_type: str = Field(
+        ..., description="The classification of the data (e.g., 'EMAIL', 'AWS_KEY')"
+    )
+    original_value: str = Field(
+        ..., description="The raw sensitive string discovered in the payload"
+    )

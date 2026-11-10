@@ -1,7 +1,12 @@
 from abc import ABC, abstractmethod
 from collections.abc import AsyncGenerator
 
-from src.domain.entities import CodeChangeDelta, MemoryPointer, SessionState
+from src.domain.entities import (
+    CodeChangeDelta,
+    MemoryPointer,
+    PIIMatch,
+    SessionState,
+)
 
 
 class TokenVaultPort(ABC):
@@ -49,4 +54,12 @@ class LLMRouterPort(ABC):
 
     @abstractmethod
     async def generate_roadmap_summary(self, session_transcript: str) -> str:
+        pass
+
+
+class PIIScannerPort(ABC):
+    """Outbound port for scanning payloads for sensitive data."""
+
+    @abstractmethod
+    def scan(self, payload: str) -> list[PIIMatch]:
         pass
